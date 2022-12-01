@@ -4,6 +4,9 @@
 	"description": "advent of code day 1",
 	"main": "index.js",
 	"scripts": {
+		"prestart": "npm run install",
+		"install": "tsc",
+    "start": "node index.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "Philipp Moeller",
