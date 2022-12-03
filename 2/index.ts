@@ -27,12 +27,7 @@ const LOSE = {
 	C: "Y",
 };
 
-function calculateTotalMatchScore(line: string): number {
-	const splitLine = line.split(" ");
-	const match = {
-		elf: splitLine[0] as ElfResult,
-		me: splitLine[1] as MeResult,
-	};
+function calculateTotalMatchScore(match: Match): number {
 	return calculateFigureScore(match) + calculateWinningScore(match);
 }
 
@@ -54,10 +49,29 @@ function calculateWinningScore(match: Match): number {
 	return 0;
 }
 
+function applyStrategy(match: Match): Match {
+	switch (match.me) {
+		case "X":
+			return { elf: match.elf, me: LOSE[match.elf] as MeResult };
+		case "Y":
+			return { elf: match.elf, me: DRAW[match.elf] as MeResult };
+		case "Z":
+			return { elf: match.elf, me: WIN[match.elf] as MeResult };
+	}
+}
+
 let totalScore1 = 0;
+let totalScore2 = 0;
 
 lines.forEach((line) => {
-	totalScore1 += calculateTotalMatchScore(line);
+	const splitLine = line.split(" ");
+	const match = {
+		elf: splitLine[0] as ElfResult,
+		me: splitLine[1] as MeResult,
+	};
+	totalScore1 += calculateTotalMatchScore(match);
+	totalScore2 += calculateTotalMatchScore(applyStrategy(match));
 });
 
 console.log(`total score part 1: ${totalScore1}`);
+console.log(`total score part 2: ${totalScore2}`);
