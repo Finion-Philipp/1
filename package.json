@@ -8,6 +8,7 @@
 		"install": "tsc",
 		"1": "npm i && node ./1/index.js",
 		"2": "npm i && node ./2/index.js",
+		"3": "npm i && node ./3/index.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "Philipp Moeller",
