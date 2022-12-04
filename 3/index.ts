@@ -18,8 +18,6 @@ function calculatePriority(item: string): number {
 		priority += 26;
 	}
 	priority += alphabetLowerCase.indexOf(item.toLowerCase()) + 1;
-	console.log(`item priority ${item}: ${priority}`);
-	console.log(alphabetLowerCase);
 	return priority;
 }
 
@@ -27,7 +25,6 @@ function findEqualItems(a: string, b: string): Array<string> {
 	let result = Array.from(
 		new Set(Array.from(a).filter((item) => b.includes(item)))
 	);
-	console.log(result);
 	return result;
 }
 
@@ -37,7 +34,6 @@ function findEqualItemsIn3(a: string, b: string, c: string): Array<string> {
 			Array.from(a).filter((item) => b.includes(item) && c.includes(item))
 		)
 	);
-	console.log(result);
 	return result;
 }
 
@@ -47,7 +43,6 @@ let result2 = 0;
 lines.forEach((line) => {
 	const compartment1 = line.substring(0, line.length / 2);
 	const compartment2 = line.substring(line.length / 2);
-	console.log(line);
 
 	result1 += findEqualItems(compartment1, compartment2)
 		.map((item) => calculatePriority(item))
