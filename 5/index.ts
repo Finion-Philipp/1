@@ -44,12 +44,9 @@ function moveCargo(times: number, from: string, to: string) {
 
 function moveCargoV9001(times: number, from: string, to: string) {
 	const prevStacks = JSON.parse(JSON.stringify(stacks));
-	console.log(`${times} from ${from} to ${to}`);
 	const cargo = stacks[from].slice(stacks[from].length - times);
 	stacks[from] = stacks[from].slice(0, stacks[from].length - times);
 	stacks[to].push(...cargo);
-	console.log(cargo);
-	console.log(stacks);
 
 	if (prevStacks[from].length != stacks[from].length + times) {
 		console.log(`from does not match`);
