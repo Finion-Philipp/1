@@ -12,6 +12,7 @@
 		"4": "npm i && node ./4/index.js",
 		"5": "npm i && node ./5/index.js",
 		"6": "npm i && node ./6/index.js",
+		"7": "npm i && node ./7/index.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "Philipp Moeller",
