@@ -14,8 +14,7 @@ interface Directory {
 	files: Files;
 	subDirs: Array<Directory>;
 	parent?: Directory;
-	directSize: number;
-	indirectSize: number;
+	size: number;
 	level: number;
 }
 
@@ -57,8 +56,7 @@ function createDirectory(name: string, parent: Directory): Directory {
 			files: {},
 			subDirs: [],
 			parent,
-			directSize: 0,
-			indirectSize: 0,
+			size: 0,
 			level: parent.level + 1,
 		};
 		parent.subDirs.push(newDir);
@@ -71,15 +69,10 @@ function createFile(name: string, size: number) {
 	currentDir.files[name] = size;
 }
 
-function calculateDirectSize(dir: Directory): number {
-	return Object.values(dir.files).reduce((a, b) => a + b, 0);
-}
-
 function calculateSizeByLvl(dir: Directory) {
-	dir.directSize = calculateDirectSize(dir);
-	dir.indirectSize =
-		dir.directSize +
-		dir.subDirs.map((subdir) => subdir.indirectSize).reduce((a, b) => a + b, 0);
+	dir.size =
+		Object.values(dir.files).reduce((a, b) => a + b, 0) + // FILES
+		dir.subDirs.map((subdir) => subdir.size).reduce((a, b) => a + b, 0); // SUB DIRECTORIES
 }
 
 // PARSING
@@ -89,8 +82,7 @@ const root: Directory = {
 	files: {},
 	subDirs: [],
 	parent: undefined,
-	directSize: 0,
-	indirectSize: 0,
+	size: 0,
 	level: 0,
 };
 
@@ -130,8 +122,8 @@ for (let currentLvl = maxLevel; currentLvl >= 0; currentLvl--) {
 // RESULT 1
 
 const result1 = allDirs
-	.filter((dir) => dir.indirectSize <= 100000)
-	.map((dir) => dir.indirectSize)
+	.filter((dir) => dir.size <= 100000)
+	.map((dir) => dir.size)
 	.reduce((a, b) => a + b);
 
 console.log(`result 1: ${result1}`);
@@ -140,11 +132,11 @@ console.log(`result 1: ${result1}`);
 
 const totalSpace = 70000000;
 const requiredSpace = 30000000;
-const freeSpace = totalSpace - root.indirectSize;
+const freeSpace = totalSpace - root.size;
 const result2 =
 	Math.min(
 		...allDirs
-			.map((dir) => dir.indirectSize - requiredSpace + freeSpace)
+			.map((dir) => dir.size - requiredSpace + freeSpace)
 			.filter((size) => size >= 0)
 	) +
 	requiredSpace -
