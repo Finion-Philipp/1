@@ -18,14 +18,12 @@ interface Directory {
 	level: number;
 }
 
-function cd(target: string) {
+// FUNCTIONS
+
+function changeCurrentDirectory(target: string) {
 	switch (target) {
 		case "..": {
-			if (currentDir.parent) {
-				currentDir = currentDir.parent;
-			} else {
-				console.log(`cannot .. from ${currentDir.name}, no parent`);
-			}
+			currentDir = currentDir.parent!!;
 			break;
 		}
 		case "/": {
@@ -34,16 +32,6 @@ function cd(target: string) {
 		}
 		default: {
 			currentDir = createDirectory(target, currentDir);
-		}
-	}
-}
-
-// FUNCTIONS
-
-function ls(command: Array<string>) {
-	switch (command[0]) {
-		case "dir": {
-			createDirectory(command[1], currentDir);
 		}
 	}
 }
@@ -87,14 +75,13 @@ const root: Directory = {
 };
 
 const allDirs = [root];
-let currentDir = root;
+let currentDir: Directory = root;
 
 lines.forEach((line) => {
 	let splitLine = line.split(" ");
-	// console.log(line);
 	switch (splitLine[0]) {
 		case "$": {
-			if (splitLine[1] === "cd") cd(splitLine[2]);
+			if (splitLine[1] === "cd") changeCurrentDirectory(splitLine[2]);
 			break;
 		}
 		case "dir": {
