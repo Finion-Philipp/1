@@ -4,6 +4,8 @@ const inputFile = "./7/input";
 
 const lines = fs.readFileSync(inputFile, "utf8").split(/\r?\n/);
 
+// INTERFACES AND TYPES
+
 interface Files {
 	[index: string]: number;
 }
@@ -14,7 +16,7 @@ interface Directory {
 	parent?: Directory;
 	directSize: number;
 	indirectSize: number;
-	isLeafDirectory: boolean;
+	level: number;
 }
 
 function cd(target: string) {
@@ -37,6 +39,8 @@ function cd(target: string) {
 	}
 }
 
+// FUNCTIONS
+
 function ls(command: Array<string>) {
 	switch (command[0]) {
 		case "dir": {
@@ -55,10 +59,9 @@ function createDirectory(name: string, parent: Directory): Directory {
 			parent,
 			directSize: 0,
 			indirectSize: 0,
-			isLeafDirectory: true,
+			level: parent.level + 1,
 		};
 		parent.subDirs.push(newDir);
-		parent.isLeafDirectory = false;
 		allDirs.push(newDir);
 	}
 	return newDir;
@@ -72,22 +75,14 @@ function calculateDirectSize(dir: Directory): number {
 	return Object.values(dir.files).reduce((a, b) => a + b, 0);
 }
 
-function calculateSizesRec(dir: Directory, childSize: number) {
+function calculateSizeByLvl(dir: Directory) {
 	dir.directSize = calculateDirectSize(dir);
-	dir.indirectSize += childSize;
-	dir.indirectSize += dir.directSize;
-	if (dir.parent) {
-		calculateSizesRec(dir.parent, dir.indirectSize);
-	}
+	dir.indirectSize =
+		dir.directSize +
+		dir.subDirs.map((subdir) => subdir.indirectSize).reduce((a, b) => a + b, 0);
 }
 
-function printDir(dir: Directory, indent: string) {
-	console.log(`${indent}-${dir.name} ${dir.indirectSize}`);
-	Object.keys(dir.files).forEach((filename) =>
-		console.log(`${indent}*${filename} ${dir.files[filename]}`)
-	);
-	dir.subDirs.forEach((subdir) => printDir(subdir, ` ${indent}`));
-}
+// PARSING
 
 const root: Directory = {
 	name: "/",
@@ -96,8 +91,9 @@ const root: Directory = {
 	parent: undefined,
 	directSize: 0,
 	indirectSize: 0,
-	isLeafDirectory: true,
+	level: 0,
 };
+
 const allDirs = [root];
 let currentDir = root;
 
@@ -119,13 +115,19 @@ lines.forEach((line) => {
 	}
 });
 
-root.directSize = calculateDirectSize(root);
+// CALCULATE SIZE
 
-allDirs
-	.filter((dir) => dir.isLeafDirectory)
-	.forEach((dir) => calculateSizesRec(dir, 0));
+const maxLevel = Math.max(...allDirs.map((dir) => dir.level));
 
-// printDir(root, "");
+for (let currentLvl = maxLevel; currentLvl >= 0; currentLvl--) {
+	allDirs
+		.filter((dir) => dir.level === currentLvl)
+		.forEach((dir) => {
+			calculateSizeByLvl(dir);
+		});
+}
+
+// RESULT 1
 
 const result1 = allDirs
 	.filter((dir) => dir.indirectSize <= 100000)
@@ -133,3 +135,19 @@ const result1 = allDirs
 	.reduce((a, b) => a + b);
 
 console.log(`result 1: ${result1}`);
+
+// RESULT 2
+
+const totalSpace = 70000000;
+const requiredSpace = 30000000;
+const freeSpace = totalSpace - root.indirectSize;
+const result2 =
+	Math.min(
+		...allDirs
+			.map((dir) => dir.indirectSize - requiredSpace + freeSpace)
+			.filter((size) => size >= 0)
+	) +
+	requiredSpace -
+	freeSpace;
+
+console.log(`result 2: ${result2}`);
