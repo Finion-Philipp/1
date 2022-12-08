@@ -49,8 +49,28 @@ function isAtBorder(pos: Position): boolean {
 	);
 }
 
-// function calculateScenicScore(pos: Position): number {}
-// function calculateScenicScoreInLine(pos: number, line: Array<number>): number {}
+function calculateScenicScore(pos: Position): number {
+	if (isAtBorder(pos)) {
+		return 0;
+	}
+	return (
+		calculateScenicScoreInLine(pos.x, rows[pos.y]) *
+		calculateScenicScoreInLine(pos.y, cols[pos.x])
+	);
+}
+function calculateScenicScoreInLine(pos: number, line: Array<number>): number {
+	const treesBefore = line.slice(0, pos).reverse();
+	let scoreBefore = treesBefore.findIndex((height) => height >= line[pos]) + 1;
+	if (scoreBefore === 0) {
+		scoreBefore = treesBefore.length;
+	}
+	const treesAfter = line.slice(pos + 1);
+	let scoreAfter = treesAfter.findIndex((height) => height >= line[pos]) + 1;
+	if (scoreAfter === 0) {
+		scoreAfter = treesAfter.length;
+	}
+	return scoreBefore * scoreAfter;
+}
 
 // PARSING
 
@@ -81,11 +101,11 @@ console.log(`result1: ${result1}`);
 
 // CALCULATING SCENIC SCORE
 
-const scores = [];
+const scores: Array<number> = [];
 cols.forEach((col, xPos) => {
 	col.forEach((_, yPos) => {
-		if (canBeSeen({ x: xPos, y: yPos })) {
-			result1++;
-		}
+		scores.push(calculateScenicScore({ x: xPos, y: yPos }));
 	});
 });
+
+console.log(`result2: ${Math.max(...scores)}`);
