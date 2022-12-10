@@ -11,7 +11,7 @@ type Position = {
 	y: number;
 };
 
-type Direction = "U" | "D" | "L" | "R";
+type Direction = "U" | "D" | "L" | "R" | "UR" | "DR" | "UL" | "DL";
 
 type Move = {
 	direction: Direction;
@@ -27,67 +27,139 @@ function parseLineToMove(line: string): Move {
 
 function makeMove(move: Move) {
 	for (let i = 0; i < move.steps; i++) {
-		moveOneStep(move.direction);
+		moveHeadOneStep(move.direction);
 	}
 }
 
-function moveOneStep(direction: Direction) {
+function moveHeadOneStep(direction: Direction) {
 	switch (direction) {
 		case "U":
-			head.y++;
+			knots[0].y++;
 			break;
 		case "D":
-			head.y--;
+			knots[0].y--;
 			break;
 		case "L":
-			head.x--;
+			knots[0].x--;
 			break;
 		case "R":
-			head.x++;
+			knots[0].x++;
 			break;
 	}
-	moveTail(direction);
+	console.log(`move head ${direction}`);
+	moveKnot(direction, 1);
 }
 
-function moveTail(headDirection: Direction) {
-	if (tailTouchesHead()) {
+function moveKnot(previousKnotDirection: Direction, currentKnot: number) {
+	if (touchesPreviousKnot(currentKnot)) {
 		return;
 	}
-	switch (headDirection) {
+	let currentDirection: Direction = previousKnotDirection;
+	switch (previousKnotDirection) {
 		case "U":
-			tail.y++;
-			tail.x = head.x;
+			knots[currentKnot].y++;
+			if (knots[currentKnot].x === knots[currentKnot - 1].x) {
+				currentDirection = "U";
+			} else if (knots[currentKnot].x > knots[currentKnot - 1].x) {
+				currentDirection = "UL";
+			} else {
+				currentDirection = "UR";
+			}
+			knots[currentKnot].x = knots[currentKnot - 1].x;
 			break;
 		case "D":
-			tail.y--;
-			tail.x = head.x;
+			knots[currentKnot].y--;
+			if (knots[currentKnot].x === knots[currentKnot - 1].x) {
+				currentDirection = "D";
+			} else if (knots[currentKnot].x > knots[currentKnot - 1].x) {
+				currentDirection = "DL";
+			} else {
+				currentDirection = "DR";
+			}
+			knots[currentKnot].x = knots[currentKnot - 1].x;
 			break;
 		case "L":
-			tail.x--;
-			tail.y = head.y;
+			knots[currentKnot].x--;
+			if (knots[currentKnot].y === knots[currentKnot - 1].y) {
+				currentDirection = "L";
+			} else if (knots[currentKnot].y > knots[currentKnot - 1].y) {
+				currentDirection = "DL";
+			} else {
+				currentDirection = "UL";
+			}
+			knots[currentKnot].y = knots[currentKnot - 1].y;
 			break;
 		case "R":
-			tail.x++;
-			tail.y = head.y;
+			knots[currentKnot].x++;
+			if (knots[currentKnot].y === knots[currentKnot - 1].y) {
+				currentDirection = "R";
+			} else if (knots[currentKnot].y > knots[currentKnot - 1].y) {
+				currentDirection = "DR";
+			} else {
+				currentDirection = "UR";
+			}
+			knots[currentKnot].y = knots[currentKnot - 1].y;
 			break;
+		case "UR": {
+			knots[currentKnot].x++;
+			knots[currentKnot].y++;
+			break;
+		}
+		case "DR": {
+			knots[currentKnot].x++;
+			knots[currentKnot].y--;
+			break;
+		}
+		case "UL": {
+			knots[currentKnot].x--;
+			knots[currentKnot].y++;
+			break;
+		}
+		case "DL": {
+			knots[currentKnot].x--;
+			knots[currentKnot].y--;
+			break;
+		}
 	}
-	saveTailPosition();
+	// console.log(`move ${currentKnot} ${currentDirection}`);
+	if (currentKnot === 9) {
+		console.log(`tail moved ${currentDirection}`);
+		saveTailPosition();
+	} else {
+		moveKnot(currentDirection, currentKnot + 1);
+	}
 }
 
-function tailTouchesHead(): boolean {
-	const absX = Math.abs(head.x - tail.x);
-	const absY = Math.abs(head.y - tail.y);
+function touchesPreviousKnot(currentKnot: number): boolean {
+	// console.log(
+	// 	`touching ${currentKnot}? (${knots[currentKnot - 1].x},${
+	// 		knots[currentKnot - 1].y
+	// 	})(${knots[currentKnot].x},${knots[currentKnot].y})`
+	// );
+	const absX = Math.abs(knots[currentKnot - 1].x - knots[currentKnot].x);
+	const absY = Math.abs(knots[currentKnot - 1].y - knots[currentKnot].y);
 	return absX <= 1 && absY <= 1;
 }
 
 function saveTailPosition() {
-	tailPositions.push(JSON.stringify(tail));
+	console.log(`tail moved ${JSON.stringify(knots[9])}`);
+	tailPositions.push(JSON.stringify(knots[9]));
 }
 
 // PARSING
 
-const head: Position = { x: 0, y: 0 };
-const tail: Position = { x: 0, y: 0 };
+const knots: Array<Position> = [
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0 },
+	{ x: 0, y: 0 },
+];
 const tailPositions: Array<string> = [];
 saveTailPosition();
 
@@ -95,4 +167,4 @@ lines.forEach((line, yIndex) => {
 	makeMove(parseLineToMove(line));
 });
 
-console.log(`result1: ${new Set(tailPositions).size}`);
+console.log(`result: ${new Set(tailPositions).size}`);
