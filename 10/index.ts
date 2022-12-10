@@ -29,9 +29,6 @@ function drawCycle() {
 }
 
 function matchesSprite(): boolean {
-	console.log(
-		`comparing cycle ${cycle} and x ${x}: ${Math.abs((cycle % 40) - x) <= 1}`
-	);
 	return Math.abs((cycle % 40) - x) <= 1;
 }
 
@@ -50,17 +47,6 @@ lines.forEach((line) => {
 	}
 });
 
-function drawLine(i: number) {
-	let line = JSON.parse(JSON.stringify(signal[i]));
-	let splitLine = [];
-	let str = "";
-	while (line.length > 5) {
-		splitLine.push(line.splice(0, 5));
-	}
-	splitLine.forEach((line) => str.concat(` ${line.join("")}`));
-	console.log(str);
-}
-
 console.log(`result1: ${interestingSignals.reduce((a, b) => a + b)}`);
 console.log();
 console.log(signal[0].join(""));
@@ -69,10 +55,3 @@ console.log(signal[2].join(""));
 console.log(signal[3].join(""));
 console.log(signal[4].join(""));
 console.log(signal[5].join(""));
-
-console.log();
-console.log();
-
-for (let j = 0; j < 6; j++) {
-	drawLine(j);
-}
