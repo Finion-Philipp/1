@@ -14,7 +14,7 @@ const signal: Array<Array<string>> = [[], [], [], [], [], []];
 
 function increaseCycle() {
 	if ((cycle + 1 + 20) % 40 === 0) {
-		interestingSignals.push(cycle * x);
+		interestingSignals.push((cycle + 1) * x);
 	}
 	if (cycle % 40 === 0) {
 		line = Math.floor(cycle / 40);
