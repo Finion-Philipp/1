@@ -13,7 +13,7 @@ const interestingSignals: Array<number> = [];
 const signal: Array<Array<string>> = [[], [], [], [], [], []];
 
 function increaseCycle() {
-	if ((cycle + 20) % 40 === 0) {
+	if ((cycle + 1 + 20) % 40 === 0) {
 		interestingSignals.push(cycle * x);
 	}
 	if (cycle % 40 === 0) {
