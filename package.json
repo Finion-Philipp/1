@@ -16,7 +16,8 @@
 		"8": "npm i && node ./8/index.js",
 		"9": "npm i && node ./9/index.js",
 		"10": "npm i && node ./10/index.js",
-		"11": "npm i && node ./11/index.js"
+		"11": "npm i && node ./11/index.js",
+		"12": "npm i && node ./12/index.js"
 	},
 	"author": "Philipp Moeller",
 	"license": "ISC",
