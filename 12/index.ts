@@ -40,15 +40,15 @@ lines.forEach((line, yIndex) => {
 });
 
 function findSpecialField(str: string): Node {
-	let returnVal = field[0][0];
+	let specialField = field[0][0];
 	lines.forEach((line, yIndex) => {
 		Array.from(line).map((it, xIndex) => {
 			if (it === str) {
-				returnVal = field[yIndex][xIndex];
+				specialField = field[yIndex][xIndex];
 			}
 		});
 	});
-	return returnVal;
+	return specialField;
 }
 
 let start: Node = findSpecialField("S");
