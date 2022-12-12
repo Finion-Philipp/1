@@ -45,7 +45,7 @@ lines.forEach((line, yIndex) => {
 	);
 });
 
-const start: Node = field
+let start: Node = field
 	.find((it) => it.findIndex((ot: Node) => ot.isStart) !== -1)
 	?.find((et) => et.isStart)!!;
 start.distance = 0;
@@ -93,7 +93,7 @@ function canMove(from: Node, to: Node): boolean {
 }
 
 function findWayRec(cur: Node, prev?: Node) {
-	if (cur.isStart && !prev) {
+	if (cur === start && !prev) {
 		findSurroundingNodes(cur).forEach((node) => findWayRec(node, cur));
 	} else if (prev && prev.distance + 1 < cur.distance) {
 		cur.distance = prev.distance + 1;
@@ -111,3 +111,28 @@ findWayRec(start);
 console.log(end.distance);
 
 // PART 2
+
+function cleanUp() {
+	field.forEach((line) =>
+		line.forEach((it) => {
+			it.distance = Number.MAX_SAFE_INTEGER;
+			it.previousNode = undefined;
+		})
+	);
+}
+
+function findWayRecWithStart(newStart: Node): number {
+	start = newStart;
+	cleanUp();
+	start = newStart;
+	start.distance = 0;
+	findWayRec(newStart);
+	return end.distance;
+}
+
+const result2: Array<number> = [];
+field
+	.flatMap((it) => it.filter((ot) => ot.elevation === 0))
+	.forEach((it) => result2.push(findWayRecWithStart(it)));
+
+console.log(Math.min(...result2));
