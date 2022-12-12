@@ -94,17 +94,17 @@ function canMove(from: Node, to: Node): boolean {
 	return from.elevation >= to.elevation || to.elevation - from.elevation === 1;
 }
 
-function findWayRec(cur: Node, prev?: Node) {
-	if (cur === start && !prev) {
-		findSurroundingNodes(cur).forEach((node) => findWayRec(node, cur));
-	} else if (prev && prev.distance + 1 < cur.distance) {
-		cur.distance = prev.distance + 1;
-		if (cur === end) {
+function findWayRec(current: Node, previous?: Node) {
+	if (current === start && !previous) {
+		findSurroundingNodes(current).forEach((node) => findWayRec(node, current));
+	} else if (previous && previous.distance + 1 < current.distance) {
+		current.distance = previous.distance + 1;
+		if (current === end) {
 			return;
 		}
-		findSurroundingNodes(cur)
-			.filter((it) => it !== prev)
-			.forEach((node) => findWayRec(node, cur));
+		findSurroundingNodes(current)
+			.filter((it) => it !== previous)
+			.forEach((node) => findWayRec(node, current));
 	}
 }
 
@@ -122,7 +122,6 @@ function cleanUp() {
 }
 
 function findWayRecWithStart(newStart: Node): number {
-	start = newStart;
 	cleanUp();
 	start = newStart;
 	start.distance = 0;
@@ -132,7 +131,7 @@ function findWayRecWithStart(newStart: Node): number {
 
 const result2: Array<number> = [];
 field
-	.flatMap((it) => it.filter((ot) => ot.elevation === 0))
+	.flatMap((it) => it.filter((node) => node.elevation === 0))
 	.forEach((it) => result2.push(findWayRecWithStart(it)));
 
 console.log(Math.min(...result2));
