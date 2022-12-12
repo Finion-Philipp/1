@@ -11,9 +11,6 @@ interface Node {
 	y: number;
 	elevation: number;
 	distance: number;
-	previousNode: Node | undefined;
-	isStart: boolean;
-	isEnd: boolean;
 }
 
 // PARSING
@@ -37,21 +34,26 @@ lines.forEach((line, yIndex) => {
 				y: yIndex,
 				elevation: toElevation(it),
 				distance: Number.MAX_SAFE_INTEGER,
-				previousNode: undefined,
-				isStart: it === "S",
-				isEnd: it === "E",
 			};
 		})
 	);
 });
 
-let start: Node = field
-	.find((it) => it.findIndex((ot: Node) => ot.isStart) !== -1)
-	?.find((et) => et.isStart)!!;
+function findSpecialField(str: string): Node {
+	let returnVal = field[0][0];
+	lines.forEach((line, yIndex) => {
+		Array.from(line).map((it, xIndex) => {
+			if (it === str) {
+				returnVal = field[yIndex][xIndex];
+			}
+		});
+	});
+	return returnVal;
+}
+
+let start: Node = findSpecialField("S");
 start.distance = 0;
-const end: Node = field
-	.find((it) => it.findIndex((ot: Node) => ot.isEnd) !== -1)
-	?.find((et) => et.isEnd)!!;
+const end: Node = findSpecialField("E");
 
 // PART 1
 
@@ -97,8 +99,7 @@ function findWayRec(cur: Node, prev?: Node) {
 		findSurroundingNodes(cur).forEach((node) => findWayRec(node, cur));
 	} else if (prev && prev.distance + 1 < cur.distance) {
 		cur.distance = prev.distance + 1;
-		cur.previousNode = prev;
-		if (cur.isEnd) {
+		if (cur === end) {
 			return;
 		}
 		findSurroundingNodes(cur)
@@ -116,7 +117,6 @@ function cleanUp() {
 	field.forEach((line) =>
 		line.forEach((it) => {
 			it.distance = Number.MAX_SAFE_INTEGER;
-			it.previousNode = undefined;
 		})
 	);
 }
