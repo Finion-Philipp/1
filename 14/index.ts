@@ -41,6 +41,11 @@ lines.forEach((line) => {
 	);
 });
 
+structures.push([
+	{ x: 310, y: 155 },
+	{ x: 666, y: 155 },
+]);
+
 function findMaxMapSize(): Position {
 	return {
 		x: Math.max(
@@ -124,20 +129,22 @@ function paintHorizontal(from: Position, to: Position) {
 }
 
 paintStructures();
-paintMap();
 
 const sand: Array<Sand> = [];
 
 function produceSand() {
-	if (get({ x: 500, y: 0 }).content !== Content.MOVING_SAND) {
+	const generatigTile = get({ x: 500, y: 0 });
+	if (generatigTile.content == Content.AIR) {
 		sand.push({ position: { x: 500, y: 0 }, isResting: false });
 		get({ x: 500, y: 0 }).content = Content.MOVING_SAND;
-	} else console.log("cannot produce sand");
+	} else if (generatigTile.content === Content.RESTING_SAND) {
+		stopIt = true;
+	}
 }
 
 function moveSand(sand: Sand) {
 	if (sand.position.y === maxMapSize.y) {
-		sandLeftMap = true;
+		stopIt = true;
 	}
 	if (!isTileBlocked({ x: sand.position.x, y: sand.position.y + 1 })) {
 		get(sand.position).content = Content.AIR;
@@ -164,6 +171,7 @@ function moveSand(sand: Sand) {
 }
 
 function isTileBlocked(pos: Position): boolean {
+	// console.log(`checking tile ${pos.x},${pos.y}`);
 	return get(pos).content !== Content.AIR;
 }
 
@@ -176,8 +184,9 @@ function makeSandCycle() {
 	produceSand();
 }
 
-let sandLeftMap = false;
-while (!sandLeftMap) {
+let stopIt = false;
+while (!stopIt) {
 	makeSandCycle();
 }
+paintMap();
 console.log(`result1: ${sand.filter((it) => it.isResting === true).length}`);
